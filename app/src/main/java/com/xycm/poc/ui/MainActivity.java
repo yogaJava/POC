@@ -2,6 +2,7 @@ package com.xycm.poc.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -54,6 +55,17 @@ public class MainActivity extends BaseActivity {
     private ValueCallback<Uri[]> filePathCallback;
     private Uri cameraUri;
 
+
+    /**
+     * 启动 MainActivity
+     *
+     * @param context 上下文，可以是 Application 或 Activity
+     */
+    public static void start(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -216,21 +228,16 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
         }
         if (photoFile != null) {
-            cameraUri = FileProvider.getUriForFile(this,
-                    getPackageName() + ".fileprovider",
-                    photoFile);
+            cameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
         }
-
         Intent pickIntent = new Intent(Intent.ACTION_GET_CONTENT);
         pickIntent.addCategory(Intent.CATEGORY_OPENABLE);
         pickIntent.setType("*/*");
-
         Intent chooser = Intent.createChooser(pickIntent, "选择文件或拍照");
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
         }
-
         startActivityForResult(chooser, FILE_CHOOSER_REQUEST_CODE);
     }
 
