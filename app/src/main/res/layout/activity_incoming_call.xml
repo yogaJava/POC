@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#101010">
+
+    <TextView
+        android:id="@+id/tv_caller"
+        android:text="来电号码"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btn_accept"
+        android:text="接听"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btn_hangup"
+        android:text="挂断"
+        android:layout_width="140dp"
+        android:layout_height="60dp"/>
+</LinearLayout>

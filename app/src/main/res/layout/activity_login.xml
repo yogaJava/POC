@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient">>
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="80dp"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 账号输入框 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_username"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:boxBackgroundColor="@color/color_input"
+        app:boxBackgroundMode="filled"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxStrokeColor="@color/color_input"
+        app:boxStrokeWidth="0dp"
+        app:hintEnabled="false"
+        app:hintTextColor="@color/color_input"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/ic_user"
+        app:startIconTint="@color/text_primary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:hint="@string/hint_username"
+            android:inputType="text"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textColor="@color/color_black"
+            android:textSize="25dp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 密码输入框 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_password"
+        android:layout_width="0dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="30dp"
+        app:boxBackgroundColor="@color/color_input"
+        app:boxBackgroundMode="filled"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxStrokeColor="@color/color_input"
+        app:boxStrokeWidth="0dp"
+        app:hintEnabled="false"
+        app:hintTextColor="@color/color_input"
+        app:layout_constraintEnd_toEndOf="@id/til_username"
+        app:layout_constraintStart_toStartOf="@id/til_username"
+        app:layout_constraintTop_toBottomOf="@id/til_username"
+        app:passwordToggleEnabled="true"
+        app:startIconDrawable="@drawable/ic_password"
+        app:startIconTint="@color/text_primary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textColor="@color/color_black"
+            android:textSize="25dp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 登录按钮 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_login"
+        android:layout_width="0dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="58dp"
+        android:text="@string/btn_login"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:backgroundTint="@color/color_primary"
+        app:cornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="@id/til_username"
+        app:layout_constraintStart_toStartOf="@id/til_username"
+        app:layout_constraintTop_toBottomOf="@id/til_password" />
+
+    <TextView
+        android:id="@+id/face_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="人脸登录"
+        app:layout_constraintEnd_toEndOf="@id/til_username"
+        app:layout_constraintStart_toStartOf="@id/til_username"
+        app:layout_constraintTop_toBottomOf="@id/btn_login" />
+
+    <LinearLayout
+        android:id="@+id/agree_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="@id/til_username"
+        app:layout_constraintStart_toStartOf="@id/til_username"
+        app:layout_constraintTop_toBottomOf="@id/face_btn">
+
+        <!-- 使用 AppCompatCheckBox 并禁用默认 Material 样式 -->
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_agree"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/checkbox_circle"
+            android:button="@null"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
+
+        <TextView
+            android:id="@+id/tv_agree"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="我已阅读并同意"
+            android:textColor="@color/color_black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Loading，覆盖按钮 -->
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/btn_login"
+        app:layout_constraintEnd_toEndOf="@id/btn_login"
+        app:layout_constraintStart_toStartOf="@id/btn_login"
+        app:layout_constraintTop_toTopOf="@id/btn_login" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
