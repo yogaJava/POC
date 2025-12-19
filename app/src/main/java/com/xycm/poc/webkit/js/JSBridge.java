@@ -1,14 +1,20 @@
 package com.xycm.poc.webkit.js;
 
-import static android.content.Context.MODE_PRIVATE;
-
+import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
+
+import com.xycm.poc.api.config.TokenManager;
+import com.xycm.poc.ui.LoginActivity;
 
 public class JSBridge {
 
     private final Context context;
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     public JSBridge(Context context) {
         this.context = context;
@@ -21,16 +27,23 @@ public class JSBridge {
 
     @JavascriptInterface
     public String getToken() {
-        return context.getSharedPreferences("app_prefs", MODE_PRIVATE)
-                .getString("token", "");
+        return TokenManager.getInstance().getToken();
     }
 
     @JavascriptInterface
     public void refreshToken(String token) {
-        context.getSharedPreferences("app_prefs", MODE_PRIVATE)
-                .edit()
-                .putString("token", token)
-                .apply();
+        TokenManager.getInstance().saveToken(token);
+    }
+
+    @JavascriptInterface
+    public void onTokenExpired() {
+        handler.post(() -> {
+            TokenManager.getInstance().clearToken();
+            TokenManager.getInstance().clearUserInfo();
+            if (context instanceof Activity) {
+                LoginActivity.start((Activity) context);
+            }
+        });
     }
 
 }

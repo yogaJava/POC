@@ -46,4 +46,8 @@ public class TokenManager {
         return this.userInfo;
     }
 
+    public void clearUserInfo() {
+        this.userInfo = null;
+    }
+
 }

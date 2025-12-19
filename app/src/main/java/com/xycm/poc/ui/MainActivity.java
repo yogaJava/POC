@@ -1,12 +1,25 @@
 package com.xycm.poc.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.provider.MediaStore;
+import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.mpttpnas.pnaslibraryapi.PnasConfigUtil;
 import com.mpttpnas.pnaslibraryapi.PnasSDK;
@@ -24,6 +37,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.IOException;
+
 import cn.hutool.core.util.StrUtil;
 
 public class MainActivity extends BaseActivity {
@@ -31,6 +47,12 @@ public class MainActivity extends BaseActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     public WebView webView;
+
+
+    public static final int FILE_CHOOSER_REQUEST_CODE = 1001;
+    private static final int PERMISSION_REQUEST_CODE = 2001;
+    private ValueCallback<Uri[]> filePathCallback;
+    private Uri cameraUri;
 
 
     @Override
@@ -60,7 +82,7 @@ public class MainActivity extends BaseActivity {
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         webView.setWebViewClient(new CustomWebViewClient());
-        webView.setWebChromeClient(new CustomWebChromeClient());
+        webView.setWebChromeClient(new CustomWebChromeClient(this));
     }
 
     private void loadUrlWithToken() {
@@ -166,4 +188,87 @@ public class MainActivity extends BaseActivity {
         }, 500);
     }
 
+    // --- 文件选择回调 ---
+    public void openFileChooser(ValueCallback<Uri[]> callback) {
+        this.filePathCallback = callback;
+        requestPermissionsAndShowChooser();
+    }
+
+    private void requestPermissionsAndShowChooser() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_CODE);
+                return;
+            }
+        }
+        showFileChooser();
+    }
+
+    private void showFileChooser() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (photoFile != null) {
+            cameraUri = FileProvider.getUriForFile(this,
+                    getPackageName() + ".fileprovider",
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
+        }
+
+        Intent pickIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        pickIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        pickIntent.setType("*/*");
+
+        Intent chooser = Intent.createChooser(pickIntent, "选择文件或拍照");
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
+        }
+
+        startActivityForResult(chooser, FILE_CHOOSER_REQUEST_CODE);
+    }
+
+    private File createImageFile() throws IOException {
+        String fileName = "IMG_" + System.currentTimeMillis();
+        File storageDir = getExternalFilesDir("Pictures");
+        return new File(storageDir, fileName + ".jpg");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+            if (filePathCallback != null) {
+                Uri[] results = null;
+                if (resultCode == RESULT_OK) {
+                    if (data == null || data.getData() == null) {
+                        if (cameraUri != null) {
+                            results = new Uri[]{cameraUri};
+                        }
+                    } else {
+                        results = new Uri[]{data.getData()};
+                    }
+                }
+                filePathCallback.onReceiveValue(results);
+                filePathCallback = null;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            showFileChooser();
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }

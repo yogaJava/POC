@@ -1,5 +1,6 @@
 package com.xycm.poc.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -44,6 +45,16 @@ public class LoginActivity extends BaseActivity {
     private CheckBox checkboxAgree;
 
     private Gson gson = new Gson();
+
+    /**
+     * 启动 InCallActivity
+     * @param context 上下文，可以是 Application 或 Activity
+     */
+    public static void start(Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
