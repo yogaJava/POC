@@ -33,7 +33,7 @@ public class CallActivity extends AppCompatActivity {
         btnAccept = findViewById(R.id.btn_accept);
         btnHangup = findViewById(R.id.btn_hangup);
         btnAccept.setOnClickListener(v -> CallManager.getInstance().startVideoCallActivity());
-        btnHangup.setOnClickListener(v -> {
+        btnHangup.setOnClickListener(view -> {
             CallManager.getInstance().rejectCall();
             finish();
         });

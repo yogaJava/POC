@@ -1,4 +1,3 @@
-
 package com.xycm.poc.util;
 
 
@@ -20,7 +19,7 @@ public class SignUtil {
         String nonce = IdUtil.fastSimpleUUID();
         String data = encryptData(appSecret, dataJsonStr);
         String sign = SecureUtil.hmacSha256(appSecret).digestHex(StrUtil.format("apiKey={}&data={}&nonce={}&ts={}", new Object[]{appKey, data, nonce, timestamp})).toUpperCase();
-        Map<String, Object> paramMap = new HashMap(5);
+        Map<String, Object> paramMap = new HashMap<>(5);
         paramMap.put("apiKey", appKey);
         paramMap.put("ts", timestamp);
         paramMap.put("nonce", nonce);

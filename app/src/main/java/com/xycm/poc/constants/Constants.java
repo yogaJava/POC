@@ -36,5 +36,25 @@ public class Constants {
      */
     public static final Integer FAIL = 500;
 
+    /**
+     * 文件选择
+     */
+    public static final int FILE_CHOOSER_REQUEST_CODE = 1001;
+
+    /**
+     * 扫码
+     */
+    public static final int REQ_QR_SCAN = 1002;
+
+    /**
+     * 人脸
+     */
+    public static final int REQ_FACE = 1003;
+
+    /**
+     * 文件存储权限请求
+     */
+    public static final int PERMISSION_REQUEST_CODE = 2001;
+
 
 }

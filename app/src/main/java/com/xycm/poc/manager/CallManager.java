@@ -16,15 +16,19 @@ import com.xycm.poc.ui.VoiceCallActivity;
  */
 public class CallManager {
 
-    private static final CallManager INSTANCE = new CallManager();
     private TrunkingCallSession currentSession;
+
     private Context appContext;
 
     private CallManager() {
     }
 
+    private static final class InstanceHolder {
+        static final CallManager instance = new CallManager();
+    }
+
     public static CallManager getInstance() {
-        return INSTANCE;
+        return InstanceHolder.instance;
     }
 
     public void init(Context context) {

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JSBridge Test</title>
+
+    <!-- vConsole（本地 / CDN 均可） -->
+    <script src="js/vconsole.min.js"></script>
+</head>
+
+<body>
+
+<button onclick="openQRScanner()">扫码</button>
+<button onclick="openFaceCapture()">人脸识别</button>
+
+<script>
+    /**********************
+     * vConsole 初始化
+     **********************/
+    (function initVConsole() {
+        // 可加开关：如 location.search.includes('debug')
+        window.vConsole = new VConsole();
+        console.log('✅ vConsole 已启用');
+    })();
+
+    /**********************
+     * JSBridge 工具
+     **********************/
+    function genCallbackId() {
+        return 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    }
+
+    function openQRScanner() {
+        const callbackId = genCallbackId();
+        console.log('[H5] openQRScanner', callbackId);
+
+        if (!window.AndroidNative) {
+            console.error('❌ AndroidNative 不存在');
+            return;
+        }
+
+        AndroidNative.invoke('scanQRCode', '{}', callbackId);
+    }
+
+    function openFaceCapture() {
+        const callbackId = genCallbackId();
+        console.log('[H5] openFaceCapture', callbackId);
+
+        if (!window.AndroidNative) {
+            console.error('❌ AndroidNative 不存在');
+            return;
+        }
+
+        AndroidNative.invoke('faceCapture', '{}', callbackId);
+    }
+
+    /**********************
+     * Native → H5 回调
+     **********************/
+    window.NativeBridgeCallback = function (callbackId, result) {
+        console.log('[NativeCallback]', callbackId, result);
+
+        if (!result) {
+            console.error('回调数据为空');
+            return;
+        }
+
+        if (result.code === 0) {
+            console.log('✅ 成功:', result.data);
+            alert('成功：' + JSON.stringify(result.data));
+        } else {
+            console.error('❌ 失败:', result.msg);
+            alert('失败：' + result.msg);
+        }
+    };
+</script>
+
+</body>
+</html>

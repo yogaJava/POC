@@ -245,7 +245,6 @@ public class FaceCaptureActivity extends BaseActivity
             result.put("imageHeight", finalBitmap.getHeight());
             result.put("quality", config.get("quality"));
             result.put("cameraFacing", isCameraFrontFacing ? "front" : "back");
-
             mainHandler.post(() -> sendResultAndFinish(result));
             recycleBitmaps(original, rotated, finalBitmap);
         } catch (Exception e) {

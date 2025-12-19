@@ -49,9 +49,9 @@ public class MainActivity extends BaseActivity {
 
     public WebView webView;
 
+    public JSBridge jsBridge;
 
-    public static final int FILE_CHOOSER_REQUEST_CODE = 1001;
-    private static final int PERMISSION_REQUEST_CODE = 2001;
+
     private ValueCallback<Uri[]> filePathCallback;
     private Uri cameraUri;
 
@@ -80,7 +80,8 @@ public class MainActivity extends BaseActivity {
         initSdk();
         webView = findViewById(R.id.webView);
         initWebView();
-        webView.addJavascriptInterface(new JSBridge(this), "AndroidNative");
+        jsBridge = new JSBridge(this, webView);
+        webView.addJavascriptInterface(jsBridge, "AndroidNative");
         loadUrlWithToken();
     }
 
@@ -208,11 +209,13 @@ public class MainActivity extends BaseActivity {
 
     private void requestPermissionsAndShowChooser() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSION_REQUEST_CODE);
+                        Constants.PERMISSION_REQUEST_CODE);
                 return;
             }
         }
@@ -238,7 +241,7 @@ public class MainActivity extends BaseActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
         }
-        startActivityForResult(chooser, FILE_CHOOSER_REQUEST_CODE);
+        startActivityForResult(chooser, Constants.FILE_CHOOSER_REQUEST_CODE);
     }
 
     private File createImageFile() throws IOException {
@@ -249,7 +252,15 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.REQ_QR_SCAN
+                || requestCode == Constants.REQ_FACE) {
+            if (jsBridge != null) {
+                jsBridge.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
+        if (requestCode == Constants.FILE_CHOOSER_REQUEST_CODE) {
             if (filePathCallback != null) {
                 Uri[] results = null;
                 if (resultCode == RESULT_OK) {
@@ -265,14 +276,13 @@ public class MainActivity extends BaseActivity {
                 filePathCallback = null;
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_CODE) {
+        if (requestCode == Constants.PERMISSION_REQUEST_CODE) {
             showFileChooser();
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

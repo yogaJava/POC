@@ -2,6 +2,7 @@ package com.xycm.poc.ui;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.zxing.BinaryBitmap;
@@ -35,7 +37,8 @@ public class CameraQRScannerActivity extends AppCompatActivity
         implements TextureView.SurfaceTextureListener, Camera.PreviewCallback {
 
     private static final String TAG = "CameraQRScanner";
-    private static final int SCAN_INTERVAL = 500; // 扫描间隔(ms)
+    // 扫描间隔(ms)
+    private static final int SCAN_INTERVAL = 500;
 
     private TextureView textureView;
     private View scanLine, scanFrame;
@@ -70,18 +73,16 @@ public class CameraQRScannerActivity extends AppCompatActivity
         scanFrame = findViewById(R.id.scanFrame);
         btnBack = findViewById(R.id.btnBack);
         btnFlash = findViewById(R.id.btnFlash);
-
         textureView.setSurfaceTextureListener(this);
-
-        btnBack.setOnClickListener(v -> finish());
-        btnFlash.setOnClickListener(v -> toggleFlash());
-
+        btnBack.setOnClickListener(view -> finish());
+        btnFlash.setOnClickListener(view -> toggleFlash());
         textureView.post(this::startScanLineAnimation);
     }
 
     private void startScanLineAnimation() {
-        if (scanFrame == null || scanLine == null) return;
-
+        if (scanFrame == null || scanLine == null) {
+            return;
+        }
         if (scanFrame.getHeight() == 0) {
             scanFrame.post(this::setupScanAnimation);
         } else {
@@ -90,8 +91,8 @@ public class CameraQRScannerActivity extends AppCompatActivity
     }
 
     private void setupScanAnimation() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(
-                scanLine, "translationY", -scanFrame.getHeight() / 2F, scanFrame.getHeight() / 2F);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(scanLine,
+                "translationY", -scanFrame.getHeight() / 2F, scanFrame.getHeight() / 2F);
         animator.setDuration(1800);
         animator.setRepeatCount(ObjectAnimator.INFINITE);
         animator.setRepeatMode(ObjectAnimator.REVERSE);
@@ -115,22 +116,22 @@ public class CameraQRScannerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+    public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
         startCamera();
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+    public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
     }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+    public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
         stopCamera();
         return true;
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
     }
 
     private void startCamera() {
@@ -226,35 +227,23 @@ public class CameraQRScannerActivity extends AppCompatActivity
                     data, width, height, frameLeft, frameTop, frameWidth, frameHeight, false);
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
             Result result = multiFormatReader.decodeWithState(bitmap);
-            if (result != null) handleScanResult(result);
+            if (result != null) {
+                handleScanResult(result);
+            }
         } catch (Exception e) {
             // 解码失败，继续扫描
         }
     }
 
     private void handleScanResult(Result result) {
-        if (result == null || !scanningEnabled) return;
-        scanningEnabled = false;
-
-        if (vibrator != null && vibrator.hasVibrator()) {
-            try {
-                vibrator.vibrate(200);
-            } catch (Exception ignored) {
-            }
-        }
-
         String content = result.getText();
-        Log.d(TAG, "扫码结果: " + content);
-        EventBus.getDefault().post(new QRScannerEvent(content));
-
-        Toast.makeText(this, "扫描成功!", Toast.LENGTH_SHORT).show();
-
-        // 停止预览
-        stopCamera();
-
-        // 延迟 finish
-        mainHandler.postDelayed(this::finish, 500);
+        Intent intent = new Intent();
+        intent.putExtra("result", content);
+        setResult(RESULT_OK, intent);
+        Toast.makeText(this, "扫描成功", Toast.LENGTH_SHORT).show();
+        finish();
     }
+
 
     private void stopCamera() {
         scanningEnabled = false;
